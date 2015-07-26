@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="40" height="40" tilewidth="32" tileheight="32" backgroundcolor="#ffffff" nextobjectid="1">
+ <tileset firstgid="1" name="tiles" tilewidth="32" tileheight="32">
+  <image source="../img/tiles.png" width="32" height="32"/>
+ </tileset>
+ <layer name="obstacles" width="40" height="40">
+  <data encoding="base64" compression="zlib">
+   eJzt1dEJACAIBUDdf+l2yMKMO/Dbh6BmRGShbqv0kE++qgn5dvfS/P7J5z6f79G5v6/8XwAAAIDpFlhrAEE=
+  </data>
+ </layer>
+</map>
