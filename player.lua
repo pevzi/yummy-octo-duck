@@ -17,14 +17,14 @@ function Player:init(x, y, world)
 
     self.jumpTimeMax = 0.3
     self.jumpTime = self.jumpTimeMax
-    self.jumpInitial = 300
-    self.jumpAdditional = 50
+    self.jumpInitial = 400
+    self.jumpAcceleration = 1100 -- should be less than gravity
 
     self.landed = false
     self.falling = true
 
     self.vmax = 180
-    self.g = 1400
+    self.gravity = 1400
 
     self.w = 16
     self.h = 32
@@ -77,12 +77,12 @@ function Player:update(dt)
         -- isn't blocked and the player has "fuel" to accelerate, if successful then give the player
         -- some additional speed
         elseif not self.falling and self.jumpTime > 0 then
+            self.vy = self.vy - self.jumpAcceleration * dt
             self.jumpTime = self.jumpTime - dt
-            self.vy = self.vy - self.jumpAdditional * self.jumpTime / self.jumpTimeMax -- doesn't depend on dt?
         end
     end
 
-    self.vy = self.vy + self.g * dt
+    self.vy = self.vy + self.gravity * dt
 
     local newX = self.x + self.vx * dt
     local newY = self.y + self.vy * dt
