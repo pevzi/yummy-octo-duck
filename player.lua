@@ -1,5 +1,6 @@
 local input = require "input"
 local r = require "resources"
+local u = require "useful"
 
 local anim8 = require "libs.anim8"
 local Object = require "libs.class"
@@ -23,7 +24,8 @@ function Player:init(x, y, world)
     self.landed = false
     self.falling = true
 
-    self.vmax = 180
+    self.vxmax = 180
+    self.accx = 1000
     self.gravity = 1400
 
     self.w = 16
@@ -47,12 +49,32 @@ function Player:update(dt)
 
     local dir = input.horizontal:getValue()
 
+    -- the player needs some time to reach the desired velocity with the specified acceleration
+
+    local tovx -- the velocity that the player's velocity needs to be changed to
+
     if dir == 0 then
-        self.vx = 0
+        tovx = 0
         self.animation:pauseAtEnd()
     else
-        self.vx = self.vmax * dir
+        tovx = dir * self.vxmax
         self.animation.flippedH = dir < 0
+    end
+
+    -- the velocity difference we need to eliminate
+    local vxdist = tovx - self.vx
+
+    -- the value that we can add/subtract during this frame
+    local dvx = self.accx * dt
+
+    -- if we don't have enough time to compensate the difference...
+    if math.abs(vxdist) > dvx then
+        -- ...then change the velocity value towards tovx
+        self.vx = self.vx + u.sign(vxdist) * dvx
+
+    -- otherwise just set the player's velocity to the desired one
+    else
+        self.vx = tovx
     end
 
     if not self.landed then
@@ -91,19 +113,17 @@ function Player:update(dt)
 
     self.landed = false
 
-    if len > 0 then
-        for i, col in ipairs(cols) do
-            if col.normal.x == 0 then -- floor or ceiling
-                self.vx = 0 -- wha?
-                self.vy = 0
+    for i, col in ipairs(cols) do
+        if col.normal.x == 0 then -- floor or ceiling
+            self.vy = 0
 
-                if col.normal.y < 0 then -- floor
-                    self.jumpTime = self.jumpTimeMax
-                    self.landed = true
-                    self.falling = false
-                    break
-                end
+            if col.normal.y < 0 then -- floor
+                self.jumpTime = self.jumpTimeMax
+                self.landed = true
+                self.falling = false
             end
+        else -- wall
+            self.vx = 0
         end
     end
 
