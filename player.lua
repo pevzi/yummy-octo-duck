@@ -45,8 +45,6 @@ function Player:init(x, y, world)
 end
 
 function Player:update(dt)
-    self.animation:resume()
-
     local dir = input.horizontal:getValue()
 
     -- the player needs some time to reach the desired velocity with the specified acceleration
@@ -59,18 +57,19 @@ function Player:update(dt)
     else
         tovx = dir * self.vxmax
         self.animation.flippedH = dir < 0
+        self.animation:resume()
     end
 
     -- the velocity difference we need to eliminate
-    local vxdist = tovx - self.vx
+    local vxdiff = tovx - self.vx
 
     -- the value that we can add/subtract during this frame
     local dvx = self.accx * dt
 
-    -- if we don't have enough time to compensate the difference...
-    if math.abs(vxdist) > dvx then
-        -- ...then change the velocity value towards tovx
-        self.vx = self.vx + u.sign(vxdist) * dvx
+    -- if we don't have enough time during this frame to fully compensate the difference...
+    if math.abs(vxdiff) > dvx then
+        -- ...then change the velocity value towards tovx as much as we can
+        self.vx = self.vx + u.sign(vxdiff) * dvx
 
     -- otherwise just set the player's velocity to the desired one
     else
