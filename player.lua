@@ -17,12 +17,11 @@ function Player:init(x, y, world)
     self.vy = 0
 
     self.jumpTimeMax = 0.3
-    self.jumpTime = self.jumpTimeMax
+    self.jumpTime = 0
     self.jumpInitial = 400
     self.jumpAcceleration = 1100 -- should be less than gravity
 
     self.landed = false
-    self.falling = true
 
     self.vxmax = 180
     self.accx = 1000
@@ -83,23 +82,24 @@ function Player:update(dt)
     self.animation:update(dt)
 
     -- varying-height jump handling
+
     if input.jump:isDown() then
         -- only initiate a jump if the jump button is just pressed this frame
         if input.jump:pressed() then
-            -- if the player is on the ground then give them an initial impulse
+            -- if the player is on the ground then give them an initial impulse and replenish the "jump fuel"
             if self.landed then
                 self.vy = -self.jumpInitial
-            -- otherwise block any attempts to accelerate until the player lands on the ground
-            else
-                self.falling = true
+                self.jumpTime = self.jumpTimeMax
             end
-
-        -- if the jump button has already been down then check if acceleration isn't blocked and the player
-        -- has "fuel" to accelerate, if successful then give the player some additional speed
-        elseif not self.falling and self.jumpTime > 0 then
+        -- if the jump button has already been down and the player has "fuel" to accelerate
+        -- then give them some additional speed
+        elseif self.jumpTime > 0 then
             self.vy = self.vy - self.jumpAcceleration * dt
             self.jumpTime = self.jumpTime - dt
         end
+    -- if the jump button is released then drain all "fuel" to disallow further acceleration until the next jump
+    elseif input.jump:released() then
+        self.jumpTime = 0
     end
 
     self.vy = self.vy + self.gravity * dt
@@ -116,9 +116,7 @@ function Player:update(dt)
             self.vy = 0
 
             if col.normal.y < 0 then -- floor
-                self.jumpTime = self.jumpTimeMax
                 self.landed = true
-                self.falling = false
             end
         else -- wall
             self.vx = 0
