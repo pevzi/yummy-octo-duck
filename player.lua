@@ -117,6 +117,8 @@ function Player:update(dt)
 
             if col.normal.y < 0 then -- floor
                 self.landed = true
+            else -- ceiling
+                self.jumpTime = 0
             end
         else -- wall
             self.vx = 0
