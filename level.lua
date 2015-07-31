@@ -8,7 +8,7 @@ local Level = Object:inherit()
 function Level:init(n)
     self.world = bump.newWorld()
 
-    self.map = sti.new(("levels/%d"):format(n))
+    self.map = sti.new(("levels/%d.lua"):format(n))
 
     local obstacles = self.map.layers.obstacles
 
