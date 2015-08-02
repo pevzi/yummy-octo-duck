@@ -3,13 +3,13 @@ local r = require "resources"
 local u = require "useful"
 
 local anim8 = require "libs.anim8"
-local Object = require "libs.class"
+local class = require "libs.middleclass"
 
 local spriteW, spriteH = 64, 64
 
-local Player = Object:inherit()
+local Player = class("Player")
 
-function Player:init(x, y, world)
+function Player:initialize(x, y, world)
     self.x = x
     self.y = y
 

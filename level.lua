@@ -1,11 +1,11 @@
 local sti = require "libs.sti"
 local gamera = require "libs.gamera"
 local bump = require "libs.bump"
-local Object = require "libs.class"
+local class = require "libs.middleclass"
 
-local Level = Object:inherit()
+local Level = class("Level")
 
-function Level:init(n)
+function Level:initialize(n)
     self.world = bump.newWorld()
 
     self.map = sti.new(("levels/%d.lua"):format(n))
