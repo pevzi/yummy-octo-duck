@@ -1,11 +1,12 @@
-local game = require "game"
 local input = require "input"
+
+local play = require "gamestates.play"
 
 local gamestate = require "libs.gamestate"
 
 function love.load()
     gamestate.registerEvents()
-    gamestate.switch(game)
+    gamestate.switch(play)
 end
 
 function love.keypressed(key)

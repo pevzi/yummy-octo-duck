@@ -3,7 +3,7 @@ local images = {
 }
 
 for k, v in pairs(images) do
-    images[k] = love.graphics.newImage("img/"..v)
+    images[k] = love.graphics.newImage("images/"..v)
 end
 
 return {
