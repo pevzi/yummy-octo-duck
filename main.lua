@@ -1,20 +1,24 @@
 local input = require "input"
+local Game = require "game"
 
-local play = require "gamestates.play"
-
-local gamestate = require "libs.gamestate"
+local game
 
 function love.load()
-    gamestate.registerEvents()
-    gamestate.switch(play)
+    game = Game()
+end
+
+function love.update(dt)
+    input.update()
+
+    game:update(dt)
+end
+
+function love.draw()
+    game:draw()
 end
 
 function love.keypressed(key)
     if key == "escape" then
         love.event.quit()
     end
-end
-
-function love.update(dt)
-    input.update()
 end

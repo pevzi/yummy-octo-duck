@@ -2,20 +2,20 @@ local Level = require "level"
 
 local Player = require "entities.player"
 
-local play = {}
+local Play = {}
 
-function play:init()
+function Play:enteredState()
     love.graphics.setBackgroundColor(255, 255, 255)
 
     self.level = Level(1)
 end
 
-function play:update(dt)
+function Play:update(dt)
     self.level:update(dt)
 end
 
-function play:draw()
+function Play:draw()
     self.level:draw()
 end
 
-return play
+return Play
