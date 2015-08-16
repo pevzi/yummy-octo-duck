@@ -2,16 +2,17 @@ local input = require "input"
 local r = require "resources"
 local u = require "useful"
 
+local Entity = require "entities.entity"
+
 local anim8 = require "libs.anim8"
 local class = require "libs.middleclass"
 
 local spriteW, spriteH = 64, 64
 
-local Player = class("Player")
+local Player = class("Player", Entity)
 
-function Player:initialize(x, y, world)
-    self.x = x
-    self.y = y
+function Player:initialize(world, x, y)
+    self.class.super.initialize(self, world, x, y, 16, 32)
 
     self.vx = 0
     self.vy = 0
@@ -27,8 +28,6 @@ function Player:initialize(x, y, world)
     self.accx = 1000
     self.gravity = 1400
 
-    self.w = 16
-    self.h = 32
     self.scale = self.h / spriteH
     self.ox = (spriteW - self.w / self.scale) / 2
     self.oy = (spriteH - self.h / self.scale) / 2
@@ -37,18 +36,12 @@ function Player:initialize(x, y, world)
 
     local grid = anim8.newGrid(spriteW, spriteH, self.image:getWidth(), self.image:getHeight())
     self.animation = anim8.newAnimation(grid(1,1, 2,1), 0.1)
-
-    self.world = world
-
-    world:add(self, x, y, self.w, self.h)
 end
 
 function Player:update(dt)
     local dir = input.horizontal:getValue()
 
-    -- the player needs some time to reach the desired velocity with the specified acceleration
-
-    local tovx -- the velocity that the player's velocity needs to be changed to
+    local tovx
 
     if dir == 0 then
         tovx = 0
@@ -59,21 +52,7 @@ function Player:update(dt)
         self.animation:resume()
     end
 
-    -- the velocity difference we need to eliminate
-    local vxdiff = tovx - self.vx
-
-    -- the value that we can add/subtract during this frame
-    local dvx = self.accx * dt
-
-    -- if we don't have enough time during this frame to fully compensate the difference...
-    if math.abs(vxdiff) > dvx then
-        -- ...then change the velocity value towards tovx as much as we can
-        self.vx = self.vx + u.sign(vxdiff) * dvx
-
-    -- otherwise just set the player's velocity to the desired one
-    else
-        self.vx = tovx
-    end
+    self.vx = u.valueTo(self.vx, tovx, self.accx, dt)
 
     if not self.landed then
         self.animation:pauseAtStart()
@@ -120,8 +99,12 @@ function Player:update(dt)
             else -- ceiling
                 self.jumpTime = 0
             end
-        else -- wall
-            self.vx = 0
+        else
+            if col.other.class.name == "Crate" then
+                col.other.vx = self.vx
+            else -- wall
+                self.vx = 0
+            end
         end
     end
 

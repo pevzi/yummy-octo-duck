@@ -7,7 +7,7 @@ return {
   height = 40,
   tilewidth = 32,
   tileheight = 32,
-  nextobjectid = 1,
+  nextobjectid = 11,
   backgroundcolor = { 255, 255, 255 },
   properties = {},
   tilesets = {
@@ -28,12 +28,48 @@ return {
       properties = {},
       terrains = {},
       tiles = {}
+    },
+    {
+      name = "crate",
+      firstgid = 2,
+      tilewidth = 32,
+      tileheight = 32,
+      spacing = 0,
+      margin = 0,
+      image = "../images/crate.png",
+      imagewidth = 32,
+      imageheight = 32,
+      tileoffset = {
+        x = 0,
+        y = 0
+      },
+      properties = {},
+      terrains = {},
+      tiles = {}
+    },
+    {
+      name = "player",
+      firstgid = 3,
+      tilewidth = 64,
+      tileheight = 64,
+      spacing = 0,
+      margin = 0,
+      image = "../images/player.png",
+      imagewidth = 128,
+      imageheight = 64,
+      tileoffset = {
+        x = 0,
+        y = 0
+      },
+      properties = {},
+      terrains = {},
+      tiles = {}
     }
   },
   layers = {
     {
       type = "tilelayer",
-      name = "obstacles",
+      name = "impassable",
       x = 0,
       y = 0,
       width = 40,
@@ -83,6 +119,66 @@ return {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+      }
+    },
+    {
+      type = "objectgroup",
+      name = "interactable",
+      visible = true,
+      opacity = 1,
+      properties = {},
+      objects = {
+        {
+          id = 3,
+          name = "",
+          type = "crate",
+          shape = "rectangle",
+          x = 128,
+          y = 128,
+          width = 32,
+          height = 32,
+          rotation = 0,
+          gid = 2,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 9,
+          name = "",
+          type = "crate",
+          shape = "rectangle",
+          x = 384,
+          y = 224,
+          width = 32,
+          height = 32,
+          rotation = 0,
+          gid = 2,
+          visible = true,
+          properties = {}
+        }
+      }
+    },
+    {
+      type = "objectgroup",
+      name = "characters",
+      visible = true,
+      opacity = 1,
+      properties = {},
+      objects = {
+        {
+          id = 7,
+          name = "",
+          type = "player",
+          shape = "rectangle",
+          x = 64,
+          y = 192,
+          width = 32,
+          height = 32,
+          rotation = 0,
+          gid = 4,
+          visible = true,
+          properties = {}
+        }
       }
     }
   }
