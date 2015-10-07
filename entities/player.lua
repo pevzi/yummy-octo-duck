@@ -62,20 +62,16 @@ function Player:update(dt)
 
     -- varying-height jump handling
 
-    if input.jump:isDown() then
-        -- only initiate a jump if the jump button is just pressed this frame
-        if input.jump:pressed() then
-            -- if the player is on the ground then give them an initial impulse and replenish the "jump fuel"
-            if self.landed then
-                self.vy = -self.jumpInitial
-                self.jumpTime = self.jumpTimeMax
-            end
-        -- if the jump button has already been down and the player has "fuel" to accelerate
-        -- then give them some additional speed
-        elseif self.jumpTime > 0 then
-            self.vy = self.vy - self.jumpAcceleration * dt
-            self.jumpTime = self.jumpTime - dt
-        end
+    -- if the jump button is just pressed this frame and the player is on the ground
+    -- then give them an initial impulse and replenish the "jump fuel"
+    if input.jump:pressed() and self.landed then
+        self.vy = -self.jumpInitial
+        self.jumpTime = self.jumpTimeMax
+    -- if the jump button has already been down and the player has "fuel" to accelerate
+    -- then give them some additional speed
+    elseif input.jump:isDown() and self.jumpTime > 0 then
+        self.vy = self.vy - self.jumpAcceleration * dt
+        self.jumpTime = self.jumpTime - dt
     -- if the jump button is released then drain all "fuel" to disallow further acceleration until the next jump
     elseif input.jump:released() then
         self.jumpTime = 0
