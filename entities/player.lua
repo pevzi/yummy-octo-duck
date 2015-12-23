@@ -12,7 +12,7 @@ local spriteW, spriteH = 64, 64
 local Player = class("Player", Entity)
 
 function Player:initialize(world, x, y)
-    self.class.super.initialize(self, world, x, y, 16, 32)
+    Player.super.initialize(self, world, x, y, 16, 32)
 
     self.vx = 0
     self.vy = 0

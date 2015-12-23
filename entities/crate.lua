@@ -7,7 +7,7 @@ local class = require "libs.middleclass"
 local Crate = class("Crate", Entity)
 
 function Crate:initialize(world, x, y, w, h, image, quad)
-    self.class.super.initialize(self, world, x, y, w, h, image, quad)
+    Crate.super.initialize(self, world, x, y, w, h, image, quad)
 
     self.vx = 0
     self.vy = 0

@@ -21,10 +21,13 @@ end
 
 function Entity:draw()
     if self.image then
+        local x = math.floor(self.x)
+        local y = math.floor(self.y)
+
         if self.quad then
-            love.graphics.draw(self.image, self.quad, self.x, self.y)
+            love.graphics.draw(self.image, self.quad, x, y)
         else
-            love.graphics.draw(self.image, self.x, self.y)
+            love.graphics.draw(self.image, x, y)
         end
     end
 end

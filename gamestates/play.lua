@@ -1,7 +1,5 @@
 local Level = require "level"
 
-local Player = require "entities.player"
-
 local Play = {}
 
 function Play:enteredState()
