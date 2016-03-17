@@ -17,7 +17,7 @@ function Crate:initialize(world, x, y, w, h, image, quad)
 end
 
 function Crate:update(dt)
-    self.vx = u.valueTo(self.vx, 0, self.accx, dt)
+    self.vx = u.valueTo(self.vx, 0, self.accx * dt)
     self.vy = self.vy + self.gravity * dt
 
     local newX = self.x + self.vx * dt

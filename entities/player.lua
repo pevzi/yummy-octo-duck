@@ -52,7 +52,7 @@ function Player:update(dt)
         self.animation:resume()
     end
 
-    self.vx = u.valueTo(self.vx, tovx, self.accx, dt)
+    self.vx = u.valueTo(self.vx, tovx, self.accx * dt)
 
     if not self.landed then
         self.animation:pauseAtStart()
