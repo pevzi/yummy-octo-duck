@@ -8,13 +8,13 @@ local function sign(x)
     end
 end
 
-local function valueTo(current, desired, d)
+local function valueTo(current, desired, delta)
     if current == desired then
         return current
     elseif current > desired then
-        return math.max(current - d, desired)
+        return math.max(current - delta, desired)
     else
-        return math.min(current + d, desired)
+        return math.min(current + delta, desired)
     end
 end
 

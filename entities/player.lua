@@ -41,18 +41,14 @@ end
 function Player:update(dt)
     local dir = input.horizontal:getValue()
 
-    local tovx
-
     if dir == 0 then
-        tovx = 0
         self.animation:pauseAtEnd()
     else
-        tovx = dir * self.vxmax
         self.animation.flippedH = dir < 0
         self.animation:resume()
     end
 
-    self.vx = u.valueTo(self.vx, tovx, self.accx * dt)
+    self.vx = u.valueTo(self.vx, self.vxmax * dir, self.accx * dt)
 
     if not self.landed then
         self.animation:pauseAtStart()
@@ -106,6 +102,7 @@ function Player:update(dt)
 end
 
 function Player:draw()
+    love.graphics.setColor(255, 255, 255)
     self.animation:draw(self.image, self.x, self.y, 0, self.scale, self.scale, self.ox, self.oy)
 end
 

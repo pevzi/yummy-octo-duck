@@ -90,6 +90,7 @@ function Level:update(dt)
 end
 
 function Level:draw()
+    love.graphics.setColor(255, 255, 255)
     self.map:draw()
 end
 

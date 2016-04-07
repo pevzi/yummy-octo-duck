@@ -20,6 +20,8 @@ function Entity:update(dt)
 end
 
 function Entity:draw()
+    love.graphics.setColor(255, 255, 255)
+
     if self.image then
         local x = math.floor(self.x)
         local y = math.floor(self.y)
