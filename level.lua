@@ -1,6 +1,7 @@
 local Player = require "entities.player"
 local Crate = require "entities.crate"
 local Tile = require "entities.tile"
+local MovingPlatform = require "entities.movingplatform"
 
 local sti = require "libs.sti"
 local gamera = require "libs.gamera"
@@ -81,6 +82,8 @@ function Level:initialize(n)
 
     initObjects(self.world, self.map, "characters")
     initObjects(self.world, self.map, "interactable")
+
+    self.map.layers.interactable.entities[MovingPlatform(self.world, 160, 96, 320, 256, 0.5, 0, 1, 64, 32)] = true
 
     initTiles(self.world, self.map, "impassable")
 end

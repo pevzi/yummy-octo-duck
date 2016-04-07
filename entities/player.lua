@@ -22,8 +22,6 @@ function Player:initialize(world, x, y)
     self.jumpInitial = 400
     self.jumpAcceleration = 1100 -- should be less than gravity
 
-    self.landed = false
-
     self.vxmax = 180
     self.accx = 1000
     self.gravity = 1400
@@ -38,6 +36,16 @@ function Player:initialize(world, x, y)
     self.animation = anim8.newAnimation(grid(1,1, 2,1), 0.1)
 end
 
+function Player:filter(other)
+    if other.class.name == "MovingPlatform" then
+        if self.y + self.h <= other.y then
+            return "slide"
+        end
+    else
+        return "slide"
+    end
+end
+
 function Player:update(dt)
     local dir = input.horizontal:getValue()
 
@@ -50,7 +58,11 @@ function Player:update(dt)
 
     self.vx = u.valueTo(self.vx, self.vxmax * dir, self.accx * dt)
 
-    if not self.landed then
+    if self.ground and self.ground.class.name == "MovingPlatform" then
+        self.ground:carry(self)
+    end
+
+    if not self.ground then
         self.animation:pauseAtStart()
     end
 
@@ -58,7 +70,7 @@ function Player:update(dt)
 
     -- varying-height jump handling
 
-    if input.jump:pressed() and self.landed then
+    if input.jump:pressed() and self.ground then
         self.vy = -self.jumpInitial
         self.jumpTime = self.jumpTimeMax
 
@@ -75,16 +87,16 @@ function Player:update(dt)
     local newX = self.x + self.vx * dt
     local newY = self.y + self.vy * dt
 
-    local actualX, actualY, cols, len = self.world:move(self, newX, newY)
+    local actualX, actualY, cols, len = self.world:move(self, newX, newY, self.filter)
 
-    self.landed = false
+    self.ground = nil
 
     for i, col in ipairs(cols) do
         if col.normal.x == 0 then -- floor or ceiling
             self.vy = 0
 
             if col.normal.y < 0 then -- floor
-                self.landed = true
+                self.ground = col.other
             else -- ceiling
                 self.jumpTime = 0
             end
