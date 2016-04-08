@@ -1,11 +1,9 @@
 local tactile = {
-  _VERSION     = 'Tactile v1.0.0',
-  _DESCRIPTION = 'A simple and straightfoward input library for LOVE.',
-  _URL         = 'https://github.com/tesselode/tactile',
-  _LICENSE     = [[
-    The MIT License (MIT)
-
-    Copyright (c) 2015 Andrew Minnich
+  _VERSION = 'Tactile v2.0',
+  _DESCRIPTION = 'A happy and friendly input library for LÖVE.',
+  _URL = 'https://github.com/tesselode/tactile',
+  _LICENSE = [[
+    Copyright (c) 2016 Andrew Minnich
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -27,143 +25,121 @@ local tactile = {
   ]]
 }
 
-local function removeByValue(t, value)
-  for i = #t, 1, -1 do
-    if t[i] == value then
-      table.remove(t, i)
-      break
+local function sign(x)
+  return x < 0 and -1 or x > 0 and 1 or 0
+end
+
+local function verify(identity, argnum, value, expected, expectedstring)
+  if type(value) ~= expected then
+    error(string.format("%s: argument %d should be a %s, got %s", identity,
+      argnum, expectedstring or expected, type(value)))
+  end
+end
+
+local Control = {}
+
+function Control:addAxis(f)
+  table.insert(self._detectors, f)
+  return self
+end
+
+function Control:addButton(f)
+  table.insert(self._detectors, function()
+    return f() and 1 or 0
+  end)
+  return self
+end
+
+function Control:addButtonPair(negative, positive)
+  table.insert(self._detectors, function()
+    local n, p = negative(), positive()
+    return n and p and 0
+      or n and -1
+      or p and 1
+      or 0
+  end)
+  return self
+end
+
+function Control:_calculateValue()
+  for i = #self._detectors, 1, -1 do
+    local value = self._detectors[i]()
+    if math.abs(value) > self.deadzone then
+      return value
     end
   end
+  return 0
 end
 
---button class
-local Button = {}
-Button.__index = Button
-
-function Button:update()
-  self.downPrev = self.down
-  self.down = false
-
-  --check whether any detectors are down
-  for _, detector in pairs(self.detectors) do
-    if detector() then
-      self.down = true
-      break
-    end
-  end
+function Control:getValue()
+  return self._currentValue
 end
 
-function Button:addDetector(detector)
-  table.insert(self.detectors, detector)
+function Control:isDown(dir)
+  local value = self:getValue()
+  return dir and sign(value) == sign(dir) or value ~= 0
 end
 
-function Button:removeDetector(detector)
-  removeByValue(self.detectors, detector)
+function Control:pressed(dir)
+  return dir and sign(self._currentValue) == sign(dir)
+    or not (self._currentValue == 0 or self._previousValue ~= 0)
 end
 
-function Button:isDown() return self.down end
-function Button:pressed() return self.down and not self.downPrev end
-function Button:released() return self.downPrev and not self.down end
-
---axis class
-local Axis = {}
-Axis.__index = Axis
-
-function Axis:getValue()
-  self.value = 0
-
-  --check whether any detectors have a value greater than the deadzone
-  for _, detector in pairs(self.detectors) do
-    local value = detector()
-    if math.abs(value) > tactile.deadzone then
-      self.value = value
-    end
-  end
-
-  return self.value
+function Control:released(dir)
+  return dir and sign(self._previousValue) == sign(dir)
+    or not (self._previousValue == 0 or self._currentValue ~= 0)
 end
 
-function Axis:addDetector(detector)
-  table.insert(self.detectors, detector)
+function Control:update()
+  self._previousValue = self._currentValue
+  self._currentValue = self:_calculateValue()
 end
 
-function Axis:removeDetector(detector)
-  removeByValue(self.detectors, detector)
-end
-
---main module
-tactile.__index = tactile
-tactile.deadzone = .25
-tactile.gamepads = love.joystick.getJoysticks()
-
-function tactile.rescan()
-  tactile.gamepads = love.joystick.getJoysticks()
-end
-
---button detectors
-function tactile.key(key)
-  return function()
-    return love.keyboard.isDown(key)
-  end
-end
-
-function tactile.gamepadButton(button, gamepadNum)
-  return function()
-    local gamepad = tactile.gamepads[gamepadNum]
-    return gamepad and gamepad:isGamepadDown(button)
-  end
-end
-
-function tactile.mouseButton(button)
-  return function()
-    return love.mouse.isDown(button)
-  end
-end
-
-function tactile.thresholdButton(axisDetector, threshold)
-  return function()
-    local value = axisDetector()
-    return value and math.abs(value) > math.abs(threshold) and (value < 0) == (threshold < 0)
-  end
-end
-
---axis detectors
-function tactile.binaryAxis(negative, positive)
-  return function()
-    local negativeValue, positiveValue = negative(), positive()
-    if negativeValue and not positiveValue then
-      return -1
-    elseif positiveValue and not negativeValue then
-      return 1
-    else
-      return 0
-    end
-  end
-end
-
-function tactile.analogStick(axis, gamepadNum)
-  return function()
-    local gamepad = tactile.gamepads[gamepadNum]
-    return gamepad and gamepad:getGamepadAxis(axis) or 0
-  end
-end
-
---button constructor
-function tactile.newButton(...)
-  local buttonInstance = {
-    detectors = {...},
-    down      = false,
-    downPrev  = false
+function tactile.newControl()
+  local control = {
+    deadzone = .5,
+    _detectors = {},
+    _currentValue = 0,
+    _previousValue = 0,
   }
-  return setmetatable(buttonInstance, Button)
+
+  setmetatable(control, {
+    __index = Control,
+    __call = function(t)
+      return t:getValue()
+    end
+  })
+
+  return control
 end
 
---axis constructor
-function tactile.newAxis(...)
-  local axisInstance = {
-    detectors = {...}
-  }
-  return setmetatable(axisInstance, Axis)
+function tactile.keys(...)
+  local keys = {...}
+  for i, key in ipairs(keys) do
+    verify('tactile.keys()', i, key, 'string', 'KeyConstant (string)')
+  end
+  return function()
+    return love.keyboard.isDown(unpack(keys))
+  end
+end
+
+function tactile.gamepadButtons(num, ...)
+  local buttons = {...}
+  for i, button in ipairs(buttons) do
+    verify('tactile.gamepadButtons()', i, button, 'string',
+      'GamepadButton (string)')
+  end
+  return function()
+    return love.joystick.getJoysticks()[num]:isGamepadDown(unpack(buttons))
+  end
+end
+
+function tactile.gamepadAxis(num, axis)
+  verify('tactile.gamepadAxis()', 1, num, 'number')
+  verify('tactile.gamepadAxis()', 2, axis, 'string', 'GamepadAxis (string)')
+  return function()
+    return love.joystick.getJoysticks()[num]:getGamepadAxis(axis)
+  end
 end
 
 return tactile

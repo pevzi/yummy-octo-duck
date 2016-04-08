@@ -1,21 +1,16 @@
 local tactile = require "libs.tactile"
 
-local keyLeft = tactile.key "left"
-local keyRight = tactile.key "right"
-local keyUp = tactile.key "up"
-local keySpace = tactile.key " "
-
-local keyXAxis = tactile.binaryAxis(keyLeft, keyRight)
-
-local horizontal = tactile.newAxis(keyXAxis)
-local jump = tactile.newButton(keyUp, keySpace)
+local controls = {
+    horizontal = tactile.newControl()
+        :addButtonPair(tactile.keys("a", "left"), tactile.keys("d", "right")),
+    jump = tactile.newControl()
+        :addButton(tactile.keys("up", "space"))
+}
 
 local function update()
-    jump:update()
+    for _, control in pairs(controls) do
+        control:update()
+    end
 end
 
-return {
-    update = update,
-    horizontal = horizontal,
-    jump = jump
-}
+return setmetatable(controls, {__index = {update = update}})
