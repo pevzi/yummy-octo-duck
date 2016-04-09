@@ -27,15 +27,9 @@ function MovingPlatform:initialize(world, x1, y1, x2, y2, velocity, position, di
 end
 
 function MovingPlatform:filter(other)
-    if other.class.name == "Player" and other.y + other.h <= self.oldY then
+    if other.y + other.h <= self.oldY then
         return "cross"
     end
-end
-
-function MovingPlatform:carry(other)
-    other.x = other.x + (self.x - self.oldX)
-    other.y = self.y - other.h
-    self.world:update(other, other.x, other.y) -- TODO: move instead of update?
 end
 
 function MovingPlatform:update(dt)
@@ -51,6 +45,9 @@ function MovingPlatform:update(dt)
 
     self.oldX, self.oldY = self.x, self.y
     self.x, self.y = lerp(self.x1, self.y1, self.x2, self.y2, self.position)
+
+    self.vx = (self.x - self.oldX) / dt
+    self.vy = (self.y - self.oldY) / dt
 
     local _, _, cols, len = self.world:move(self, self.x, self.y, self.filter)
 

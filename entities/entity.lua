@@ -9,6 +9,9 @@ function Entity:initialize(world, x, y, w, h, image, quad)
     self.w = w
     self.h = h
 
+    self.vx = 0
+    self.vy = 0
+
     self.image = image
     self.quad = quad
 

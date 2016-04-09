@@ -14,8 +14,7 @@ local Player = class("Player", Entity)
 function Player:initialize(world, x, y)
     Player.super.initialize(self, world, x, y, 16, 32)
 
-    self.vx = 0
-    self.vy = 0
+    self.rvx = 0
 
     self.jumpTimeMax = 0.3
     self.jumpTime = 0
@@ -56,10 +55,14 @@ function Player:update(dt)
         self.animation:resume()
     end
 
-    self.vx = u.valueTo(self.vx, self.vxmax * dir, self.accx * dt)
+    self.rvx = u.valueTo(self.rvx, self.vxmax * dir, self.accx * dt)
 
-    if self.ground and self.ground.class.name == "MovingPlatform" then
-        self.ground:carry(self)
+    if self.ground then
+        self.vx = self.rvx + self.ground.vx
+        self.y = self.ground.y - self.h
+        self.world:update(self, self.x, self.y)
+    else
+        self.vx = self.rvx
     end
 
     if not self.ground then
@@ -104,7 +107,7 @@ function Player:update(dt)
             if col.other.class.name == "Crate" then
                 col.other.vx = self.vx
             else -- wall
-                self.vx = 0
+                self.rvx = 0
             end
         end
     end
