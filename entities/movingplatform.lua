@@ -27,7 +27,7 @@ function MovingPlatform:initialize(world, x1, y1, x2, y2, velocity, position, di
 end
 
 function MovingPlatform:filter(other)
-    if other.y + other.h <= self.oldY then
+    if other.y + other.h <= self.oldY and other.vy > self.vy then
         return "cross"
     end
 end
